@@ -236,7 +236,8 @@ func (m *Manager) BuildStatus(ctx context.Context, spec config.ToolSpec) (ToolSt
 		return st, nil
 	}
 	st.LatestVersion = latest
-	st.UpdateAvailable = installed && latest != "" && installedVersion != "" && latest != installedVersion
+	// tag 带 v、探测出的版本不带 v,须按语义比较,而非字符串相等。
+	st.UpdateAvailable = installed && latest != "" && installedVersion != "" && CompareVersions(latest, installedVersion) > 0
 	return st, nil
 }
 
