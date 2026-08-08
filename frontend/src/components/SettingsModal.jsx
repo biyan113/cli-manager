@@ -1,6 +1,7 @@
 import {useState} from 'react';
+import LogPanel from './LogPanel';
 
-function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, onClose, onSave, onSaveDeepSeek, onSaveDeepSeekModel}) {
+function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs, onClose, onSave, onSaveDeepSeek, onSaveDeepSeekModel}) {
     const [token, setToken] = useState('');
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
@@ -142,6 +143,11 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, onClo
                         </button>
                     </form>
                     {dsModelMessage && <div className="form-info">{dsModelMessage}</div>}
+
+                    <div className="log-section">
+                        <div className="log-section-title">日志</div>
+                        <LogPanel logs={logs}/>
+                    </div>
                 </div>
             </div>
         </div>

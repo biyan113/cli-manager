@@ -20,7 +20,6 @@ import {EventsOn, EventsOff} from "../wailsjs/runtime/runtime";
 
 import ToolCard from './components/ToolCard';
 import AddToolForm from './components/AddToolForm';
-import LogPanel from './components/LogPanel';
 import SettingsModal from './components/SettingsModal';
 import ExplainModal from './components/ExplainModal';
 
@@ -208,8 +207,6 @@ function App() {
                 )}
             </main>
 
-            <LogPanel logs={logs}/>
-
             {showAdd && (
                 <AddToolForm
                     onClose={() => setShowAdd(false)}
@@ -222,6 +219,7 @@ function App() {
                     hasToken={config.has_token}
                     hasDeepSeekToken={config.has_deepseek_token}
                     deepseekModel={config.deepseek_model}
+                    logs={logs}
                     onClose={() => setShowSettings(false)}
                     onSave={handleSetToken}
                     onSaveDeepSeek={handleSetDeepSeekToken}

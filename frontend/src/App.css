@@ -503,13 +503,27 @@ body {
 
 .token-form input { flex: 1; }
 
-/* ---------- 日志面板 ---------- */
+/* ---------- 日志面板(设置弹窗内) ---------- */
 .log-panel {
-    border-top: 1px solid var(--card-border);
+    border: 1px solid var(--card-border);
     background: var(--bg-light);
-    height: 160px;
+    border-radius: var(--radius-sm);
+    height: 200px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+.log-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+}
+
+.log-section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .log-header {
