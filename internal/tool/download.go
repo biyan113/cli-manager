@@ -147,21 +147,31 @@ func (m *Manager) installVersion(ctx context.Context, spec config.ToolSpec, vers
 		return InstallResult{}, wrapErr(spec.ID, err)
 	}
 
-	// 阶段 6:设权限 + 原子替换(独占锁保护)
+	// 阶段 6:若为 zip/tar.gz 压缩包,解出真正的二进制
+	binTmp, err := extractBinary(tmpName, spec.Binary)
+	if err != nil {
+		m.emitStatus(spec.ID, op, "error", "", err.Error())
+		return InstallResult{}, wrapErr(spec.ID, err)
+	}
+	if binTmp != tmpName {
+		defer os.Remove(binTmp) // 解压出的临时文件,安装完成后清理
+	}
+
+	// 阶段 7:设权限 + 原子替换(独占锁保护)
 	m.installMu.Lock()
 	defer m.installMu.Unlock()
 	m.emitProgress(spec.ID, op, 0, 0, "install")
 
 	if runtime.GOOS != "windows" {
-		if err := os.Chmod(tmpName, 0o755); err != nil {
+		if err := os.Chmod(binTmp, 0o755); err != nil {
 			return InstallResult{}, wrapErr(spec.ID, fmt.Errorf("设置权限: %w", err))
 		}
 	}
-	if err := os.Rename(tmpName, target); err != nil {
+	if err := os.Rename(binTmp, target); err != nil {
 		// Windows 下 rename 覆盖已存在文件可能失败,退化为删旧再 rename(非原子)。
 		if runtime.GOOS == "windows" {
 			if rmErr := os.Remove(target); rmErr == nil || os.IsNotExist(rmErr) {
-				err = os.Rename(tmpName, target)
+				err = os.Rename(binTmp, target)
 			}
 		}
 		if err != nil {
@@ -169,7 +179,7 @@ func (m *Manager) installVersion(ctx context.Context, spec config.ToolSpec, vers
 		}
 	}
 
-	// 阶段 7:写 state
+	// 阶段 8:写 state
 	m.State.Versions[spec.ID] = config.InstalledInfo{
 		Version: effectiveVersion,
 		BinPath: target,
