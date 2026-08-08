@@ -1,0 +1,13 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: transparent; /* 由 #app 提供圆角背景,四角透出桌面 */
+    color: #26211c;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    overflow: hidden;
+}
+
+#root {
+    height: 100vh;
+}
