@@ -68,7 +68,8 @@ func findZipBinary(files []*zip.File, binary string) *zip.File {
 		if f.FileInfo().IsDir() {
 			continue
 		}
-		if strings.EqualFold(filepath.Base(f.Name), binary) {
+		base := filepath.Base(f.Name)
+		if strings.EqualFold(base, binary) || strings.EqualFold(base, binary+".exe") {
 			return f
 		}
 	}
@@ -123,7 +124,8 @@ func extractFromTarGz(srcPath, binary string) (string, error) {
 		if hdr.Typeflag != tar.TypeReg && hdr.Typeflag != tar.TypeRegA {
 			continue
 		}
-		if !strings.EqualFold(filepath.Base(hdr.Name), binary) {
+		base := filepath.Base(hdr.Name)
+		if !strings.EqualFold(base, binary) && !strings.EqualFold(base, binary+".exe") {
 			continue
 		}
 		return writeExtracted(tr, srcPath, binary)

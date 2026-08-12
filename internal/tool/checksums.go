@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
+
+var bsdSHA256Line = regexp.MustCompile(`(?i)^SHA-?256\s*\((.+)\)\s*=\s*([0-9a-f]{64})$`)
 
 // parseChecksums 解析 sha256sum 格式的 checksums 文本,返回 filename → sha256 hex。
 // 兼容行首 * 的 binary 模式标记、空格/多空格分隔、空行和 # 注释。
@@ -18,6 +21,10 @@ func parseChecksums(data []byte) (map[string]string, error) {
 	for lineNo, raw := range strings.Split(string(data), "\n") {
 		line := strings.TrimSpace(raw)
 		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if match := bsdSHA256Line.FindStringSubmatch(line); len(match) == 3 {
+			sums[strings.TrimSpace(match[1])] = strings.ToLower(match[2])
 			continue
 		}
 		fields := strings.Fields(line)

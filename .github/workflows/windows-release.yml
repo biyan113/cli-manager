@@ -1,0 +1,86 @@
+name: Windows package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    runs-on: [self-hosted, Windows, X64, cli-manager]
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Require D drive runner workspace
+        run: |
+          if ($env:GITHUB_WORKSPACE -notlike 'D:\*') {
+            throw "Runner workspace must be on D:; got $env:GITHUB_WORKSPACE"
+          }
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Verify packaging tools
+        run: |
+          go version
+          node --version
+          npm --version
+          if (-not (Get-Command makensis -ErrorAction SilentlyContinue)) {
+            throw 'NSIS makensis is not available on PATH'
+          }
+          go install github.com/wailsapp/wails/v2/cmd/wails@v2.12.0
+          $wails = Join-Path (go env GOPATH) 'bin\wails.exe'
+          & $wails version
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build NSIS installer
+        run: |
+          $wails = Join-Path (go env GOPATH) 'bin\wails.exe'
+          & $wails build -clean -platform windows/amd64 -nsis
+
+      - name: Collect artifacts and checksums
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          Copy-Item build\bin\*.exe artifacts\
+          Get-ChildItem artifacts\*.exe | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($_.Name)" | Add-Content artifacts\SHA256SUMS.txt -Encoding ascii
+          }
+          if (-not (Test-Path artifacts\*-installer.exe)) {
+            throw 'NSIS installer was not produced'
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-manager-windows-amd64
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" artifacts\* --generate-notes --verify-tag

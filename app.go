@@ -213,8 +213,14 @@ func (a *App) GetConfig() map[string]any {
 		"has_token":          hasToken,
 		"has_deepseek_token": cfg.DeepSeekToken != "",
 		"deepseek_model":     cfg.DeepSeekModel,
+		"language":           cfg.Language,
 		"tool_count":         len(cfg.Tools),
 	}
+}
+
+// SetLanguage persists the UI language preference.
+func (a *App) SetLanguage(language string) error {
+	return a.manager.Config.SetLanguage(language)
 }
 
 // SetDeepSeekModel 设置 DeepSeek 模型并落盘。
@@ -239,10 +245,10 @@ var (
 )
 
 type explainEntry struct {
-	summary    string
-	summaryEN  string
-	releases   []ReleaseNote
-	at         time.Time
+	summary   string
+	summaryEN string
+	releases  []ReleaseNote
+	at        time.Time
 }
 
 // ReleaseNote 是某个版本的更新说明。
@@ -255,9 +261,9 @@ type ReleaseNote struct {
 
 // ToolExplanation 是"工具说明"的完整结果:模型生成的中英双语简介 + 最近版本更新说明。
 type ToolExplanation struct {
-	Summary  string        `json:"summary"` // 简体中文
-	SummaryEN string       `json:"summary_en,omitempty"` // 英文
-	Releases []ReleaseNote `json:"releases"`
+	Summary   string        `json:"summary"`              // 简体中文
+	SummaryEN string        `json:"summary_en,omitempty"` // 英文
+	Releases  []ReleaseNote `json:"releases"`
 }
 
 // GetToolExplanation 生成某个工具的中英双语说明。

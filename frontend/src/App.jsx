@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import './App.css';
 import {
     ListTools,
@@ -12,6 +12,7 @@ import {
     SetToken,
     SetDeepSeekToken,
     SetDeepSeekModel,
+    SetLanguage,
     GetConfig,
     GetAvailableVersions,
     GetToolExplanation,
@@ -22,6 +23,7 @@ import ToolCard from './components/ToolCard';
 import AddToolForm from './components/AddToolForm';
 import SettingsModal from './components/SettingsModal';
 import ExplainModal from './components/ExplainModal';
+import {createTranslator} from './i18n';
 
 function App() {
     const [tools, setTools] = useState([]);
@@ -29,10 +31,13 @@ function App() {
     const [logs, setLogs] = useState([]);
     const [showAdd, setShowAdd] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [config, setConfig] = useState({install_dir: '', has_token: false, has_deepseek_token: false, deepseek_model: '', tool_count: 0});
+    const [config, setConfig] = useState({install_dir: '', has_token: false, has_deepseek_token: false, deepseek_model: '', language: 'auto', tool_count: 0});
     const [explain, setExplain] = useState(null); // {id, name, loading, text, textEN, releases, error}
     const [toast, setToast] = useState(null);
     const toastTimer = useRef(null);
+    const t = useMemo(() => createTranslator(config.language), [config.language]);
+    const tRef = useRef(t);
+    useEffect(() => { tRef.current = t; }, [t]);
 
     // 刷新工具列表
     const refresh = async () => {
@@ -60,9 +65,9 @@ function App() {
             });
             refresh();
             if (e.status === 'error') {
-                showToast('error', `${e.tool_id}: ${e.message || '操作失败'}`);
+                showToast('error', `${e.tool_id}: ${e.message || tRef.current('operationFailed')}`);
             } else if (e.status === 'done') {
-                showToast('success', `${e.tool_id} ${e.op} ${e.version} 成功`);
+                showToast('success', tRef.current('operationSuccess', {id: e.tool_id, operation: e.op, version: e.version}));
             }
         };
         const onLog = (e) => {
@@ -92,11 +97,11 @@ function App() {
             if (op === 'install') await InstallTool(id);
             else if (op === 'update') await UpdateTool(id);
             else if (op === 'uninstall') {
-                if (window.confirm(`确认卸载 ${id}?`)) await UninstallTool(id);
+                if (window.confirm(t('confirmUninstall', {id}))) await UninstallTool(id);
                 return;
             }
             else if (op === 'remove') {
-                if (window.confirm(`从清单移除 ${id}(不影响已安装的二进制)?`)) {
+                if (window.confirm(t('confirmRemove', {id}))) {
                     await RemoveTool(id);
                     refresh();
                 }
@@ -112,10 +117,10 @@ function App() {
         try {
             const versions = await GetAvailableVersions(id);
             if (!versions || versions.length === 0) {
-                showToast('error', `${id}: 没有可用版本`);
+                showToast('error', t('noVersions', {id}));
                 return;
             }
-            const chosen = window.prompt(`选择要降级到的版本(可用: ${versions.join(', ')})`, versions[0]);
+            const chosen = window.prompt(t('chooseVersion', {versions: versions.join(', ')}), versions[0]);
             if (!chosen) return;
             await DowngradeTool(id, chosen);
         } catch (e) {
@@ -128,10 +133,10 @@ function App() {
         try {
             await AddTool(spec);
             setShowAdd(false);
-            showToast('success', `已添加 ${spec.id}`);
+            showToast('success', t('added', {id: spec.id}));
             refresh();
         } catch (e) {
-            showToast('error', `添加失败: ${e}`);
+            showToast('error', t('addFailed', {error: e}));
             throw e;
         }
     };
@@ -154,6 +159,11 @@ function App() {
         GetConfig().then(setConfig);
     };
 
+    const handleSetLanguage = async (language) => {
+        await SetLanguage(language);
+        setConfig(prev => ({...prev, language}));
+    };
+
     // 拉取工具中文说明(含最新更新说明)
     const handleExplain = async (id) => {
         const tool = tools.find(t => t.spec.id === id);
@@ -174,12 +184,12 @@ function App() {
                 <div className="topbar-left" />{/* 左侧留白,为系统原生红黄绿按钮让位 */}
                 <div className="brand">
                     <h1>CLI Manager</h1>
-                    <span className="tool-count">{tools.length} 个工具</span>
+                    <span className="tool-count">{t('toolCount', {count: tools.length})}</span>
                 </div>
                 <div className="topbar-actions">
-                    <button className="btn btn-ghost" onClick={refresh}>刷新</button>
-                    <button className="btn btn-ghost" onClick={() => setShowSettings(true)}>设置</button>
-                    <button className="btn btn-primary" onClick={() => setShowAdd(true)}>+ 添加工具</button>
+                    <button className="btn btn-ghost" onClick={refresh}>{t('refresh')}</button>
+                    <button className="btn btn-ghost" onClick={() => setShowSettings(true)}>{t('settings')}</button>
+                    <button className="btn btn-primary" onClick={() => setShowAdd(true)}>{t('addTool')}</button>
                 </div>
             </header>
 
@@ -188,8 +198,8 @@ function App() {
             <main className="content">
                 {tools.length === 0 ? (
                     <div className="empty-state">
-                        <p>还没有管理的工具</p>
-                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>添加第一个工具</button>
+                        <p>{t('empty')}</p>
+                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>{t('addFirst')}</button>
                     </div>
                 ) : (
                     <div className="tool-grid">
@@ -201,6 +211,7 @@ function App() {
                                 onAction={handleAction}
                                 onDowngrade={handleDowngrade}
                                 onExplain={handleExplain}
+                                t={t}
                             />
                         ))}
                     </div>
@@ -211,6 +222,7 @@ function App() {
                 <AddToolForm
                     onClose={() => setShowAdd(false)}
                     onAdd={handleAdd}
+                    t={t}
                 />
             )}
             {showSettings && (
@@ -224,6 +236,8 @@ function App() {
                     onSave={handleSetToken}
                     onSaveDeepSeek={handleSetDeepSeekToken}
                     onSaveDeepSeekModel={handleSetDeepSeekModel}
+                    onSaveLanguage={handleSetLanguage}
+                    t={t}
                 />
             )}
 
@@ -236,6 +250,7 @@ function App() {
                     loading={explain.loading}
                     error={explain.error}
                     onClose={() => setExplain(null)}
+                    t={t}
                 />
             )}
         </div>

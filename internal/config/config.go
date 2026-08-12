@@ -38,10 +38,12 @@ type ToolSpec struct {
 
 // Config 是 tools.json 的完整结构。
 type Config struct {
+	SchemaVersion int        `json:"schema_version"`
 	InstallDir    string     `json:"install_dir"`
 	GithubToken   string     `json:"github_token"`
 	DeepSeekToken string     `json:"deepseek_token"` // DeepSeek API key,用于"工具说明"功能
 	DeepSeekModel string     `json:"deepseek_model"` // DeepSeek 模型,用于"工具说明"功能
+	Language      string     `json:"language"`       // "auto" | "zh-CN" | "en"
 	Tools         []ToolSpec `json:"tools"`
 
 	mu sync.Mutex `json:"-"`
@@ -94,7 +96,9 @@ func Load() (*Config, error) {
 	data, err := os.ReadFile(ConfigPath())
 	if err != nil {
 		if os.IsNotExist(err) {
+			c.SchemaVersion = CurrentSchemaVersion
 			c.InstallDir = DefaultInstallDir()
+			c.Language = DefaultLanguage
 			c.Tools = DefaultTools()
 			if err := c.Save(); err != nil {
 				return nil, fmt.Errorf("写入默认配置: %w", err)
@@ -106,27 +110,51 @@ func Load() (*Config, error) {
 	if err := json.Unmarshal(data, c); err != nil {
 		return nil, fmt.Errorf("解析配置 %s: %w", ConfigPath(), err)
 	}
-	c.normalize()
+	if c.normalize() {
+		if err := c.Save(); err != nil {
+			return nil, fmt.Errorf("迁移配置: %w", err)
+		}
+	}
 	return c, nil
 }
 
-// normalize 补齐缺失字段:默认安装目录、无 tools 时内置 asc、每个工具的默认平台映射。
-func (c *Config) normalize() {
+// normalize 补齐缺失字段，并按 schema version 执行一次性默认工具迁移。
+// 返回配置是否发生变化。
+func (c *Config) normalize() bool {
+	changed := false
 	if c.InstallDir == "" {
 		c.InstallDir = DefaultInstallDir()
+		changed = true
 	}
 	if c.DeepSeekModel == "" {
 		c.DeepSeekModel = DefaultDeepSeekModel
+		changed = true
 	}
-	if len(c.Tools) == 0 {
-		c.Tools = DefaultTools()
+	if !validLanguage(c.Language) {
+		c.Language = DefaultLanguage
+		changed = true
+	}
+	if c.SchemaVersion < CurrentSchemaVersion {
+		existing := make(map[string]bool, len(c.Tools))
+		for _, spec := range c.Tools {
+			existing[spec.ID] = true
+		}
+		for _, spec := range DefaultTools() {
+			if !existing[spec.ID] {
+				c.Tools = append(c.Tools, spec)
+			}
+		}
+		c.SchemaVersion = CurrentSchemaVersion
+		changed = true
 	}
 	for i := range c.Tools {
 		t := &c.Tools[i]
 		if t.VersionCmd == nil || len(t.VersionCmd) == 0 {
 			t.VersionCmd = []string{"--version"}
+			changed = true
 		}
 	}
+	return changed
 }
 
 // Save 原子写配置:先写临时文件再 os.Rename 覆盖。
@@ -210,6 +238,20 @@ func (c *Config) SetDeepSeekModel(model string) error {
 		c.DeepSeekModel = DefaultDeepSeekModel
 	}
 	return c.Save()
+}
+
+// SetLanguage updates the UI language preference.
+func (c *Config) SetLanguage(language string) error {
+	language = strings.TrimSpace(language)
+	if !validLanguage(language) {
+		return fmt.Errorf("不支持的语言 %q", language)
+	}
+	c.Language = language
+	return c.Save()
+}
+
+func validLanguage(language string) bool {
+	return language == "auto" || language == "zh-CN" || language == "en"
 }
 
 // LoadState 读取安装状态;不存在时返回空状态。

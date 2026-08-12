@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import LogPanel from './LogPanel';
 
-function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs, onClose, onSave, onSaveDeepSeek, onSaveDeepSeekModel}) {
+function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs, onClose, onSave, onSaveDeepSeek, onSaveDeepSeekModel, onSaveLanguage, t}) {
     const [token, setToken] = useState('');
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState('');
@@ -19,9 +19,9 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
         try {
             await onSave(token.trim());
             setToken('');
-            setMessage('已保存');
+            setMessage(t('saved'));
         } catch (err) {
-            setMessage(`保存失败: ${err}`);
+            setMessage(t('saveFailed', {error: err}));
         } finally {
             setSaving(false);
         }
@@ -34,9 +34,9 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
         try {
             await onSaveDeepSeek(dsToken.trim());
             setDsToken('');
-            setDsMessage('已保存');
+            setDsMessage(t('saved'));
         } catch (err) {
-            setDsMessage(`保存失败: ${err}`);
+            setDsMessage(t('saveFailed', {error: err}));
         } finally {
             setDsSaving(false);
         }
@@ -49,9 +49,9 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
         try {
             await onSaveDeepSeekModel(dsModel.trim());
             setDsModel('');
-            setDsModelMessage('已保存');
+            setDsModelMessage(t('saved'));
         } catch (err) {
-            setDsModelMessage(`保存失败: ${err}`);
+            setDsModelMessage(t('saveFailed', {error: err}));
         } finally {
             setDsModelSaving(false);
         }
@@ -61,23 +61,23 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>设置</h2>
+                    <h2>{t('settings')}</h2>
                     <button className="btn btn-ghost btn-sm" onClick={onClose}>✕</button>
                 </div>
                 <div className="modal-body">
                     <div className="setting-row">
-                        <span className="setting-label">安装目录</span>
+                        <span className="setting-label">{t('installDir')}</span>
                         <span className="setting-value mono">{config.install_dir || '~/.local/bin'}</span>
                     </div>
                     <div className="setting-row">
-                        <span className="setting-label">工具数量</span>
+                        <span className="setting-label">{t('tools')}</span>
                         <span className="setting-value">{config.tool_count}</span>
                     </div>
                     <div className="setting-row">
                         <span className="setting-label">GitHub Token</span>
                         <span className="setting-value">
-                            {hasToken ? <span className="badge badge-ok">已配置</span> :
-                                <span className="badge badge-muted">未配置(匿名限流 60 次/时)</span>}
+                            {hasToken ? <span className="badge badge-ok">{t('configured')}</span> :
+                                <span className="badge badge-muted">{t('anonymousLimit')}</span>}
                         </span>
                     </div>
                     <form onSubmit={handleSave} className="token-form">
@@ -85,44 +85,44 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
                             type="password"
                             value={token}
                             onChange={e => setToken(e.target.value)}
-                            placeholder={hasToken ? '输入新 token 以替换' : '输入 GitHub token'}
+                            placeholder={hasToken ? t('replaceToken') : t('inputToken')}
                             autoComplete="off"
                             className="mono"
                         />
                         <button type="submit" className="btn btn-primary" disabled={saving || !token.trim()}>
-                            {saving ? '保存中…' : '保存'}
+                            {saving ? t('saving') : t('save')}
                         </button>
                     </form>
                     {message && <div className="form-info">{message}</div>}
 
                     <div className="setting-row">
-                        <span className="setting-label">DeepSeek API Key(工具说明)</span>
+                        <span className="setting-label">{t('deepseekKey')}</span>
                         <span className="setting-value">
-                            {hasDeepSeekToken ? <span className="badge badge-ok">已配置</span> :
-                                <span className="badge badge-muted">未配置</span>}
+                            {hasDeepSeekToken ? <span className="badge badge-ok">{t('configured')}</span> :
+                                <span className="badge badge-muted">{t('notConfigured')}</span>}
                         </span>
                     </div>
-                    <p className="field-hint">点击卡片上的「说明」按钮,会用 DeepSeek 根据仓库最新 README 生成中文简介。</p>
+                    <p className="field-hint">{t('deepseekHint')}</p>
                     <form onSubmit={handleSaveDeepSeek} className="token-form">
                         <input
                             type="password"
                             value={dsToken}
                             onChange={e => setDsToken(e.target.value)}
-                            placeholder={hasDeepSeekToken ? '输入新 key 以替换' : '输入 DeepSeek API key'}
+                            placeholder={hasDeepSeekToken ? t('replaceKey') : t('inputKey')}
                             autoComplete="off"
                             className="mono"
                         />
                         <button type="submit" className="btn btn-primary" disabled={dsSaving || !dsToken.trim()}>
-                            {dsSaving ? '保存中…' : '保存'}
+                            {dsSaving ? t('saving') : t('save')}
                         </button>
                     </form>
                     {dsMessage && <div className="form-info">{dsMessage}</div>}
 
                     <div className="setting-row">
-                        <span className="setting-label">DeepSeek 模型</span>
+                        <span className="setting-label">{t('deepseekModel')}</span>
                         <span className="setting-value mono">{deepseekModel || 'deepseek-v4-flash'}</span>
                     </div>
-                    <p className="field-hint">选择或输入模型名,点击卡片「说明」时按所选模型生成简介。</p>
+                    <p className="field-hint">{t('modelHint')}</p>
                     <form onSubmit={handleSaveDeepSeekModel} className="token-form">
                         <input
                             list="ds-models"
@@ -139,14 +139,25 @@ function SettingsModal({config, hasToken, hasDeepSeekToken, deepseekModel, logs,
                             <option value="deepseek-reasoner"/>
                         </datalist>
                         <button type="submit" className="btn btn-primary" disabled={dsModelSaving || !dsModel.trim()}>
-                            {dsModelSaving ? '保存中…' : '保存'}
+                            {dsModelSaving ? t('saving') : t('save')}
                         </button>
                     </form>
                     {dsModelMessage && <div className="form-info">{dsModelMessage}</div>}
 
+                    <div className="setting-row">
+                        <span className="setting-label">{t('language')}</span>
+                        <select className="setting-value" value={config.language || 'auto'}
+                                onChange={e => onSaveLanguage(e.target.value)}>
+                            <option value="auto">{t('languageAuto')}</option>
+                            <option value="zh-CN">{t('languageZh')}</option>
+                            <option value="en">{t('languageEn')}</option>
+                        </select>
+                    </div>
+                    <p className="field-hint">{t('languageHint')}</p>
+
                     <div className="log-section">
-                        <div className="log-section-title">日志</div>
-                        <LogPanel logs={logs}/>
+                        <div className="log-section-title">{t('logs')}</div>
+                        <LogPanel logs={logs} t={t}/>
                     </div>
                 </div>
             </div>

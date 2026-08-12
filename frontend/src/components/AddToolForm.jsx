@@ -13,7 +13,7 @@ function Field({label, hint, children}) {
     );
 }
 
-function AddToolForm({onClose, onAdd}) {
+function AddToolForm({onClose, onAdd, t}) {
     const [form, setForm] = useState({
         id: '',
         name: '',
@@ -37,7 +37,7 @@ function AddToolForm({onClose, onAdd}) {
     // 快速加入:粘贴 GitHub 地址,自动解析并预填表单
     const handleParse = async () => {
         if (!ghUrl.trim()) {
-            setError('请输入 GitHub 地址');
+            setError(t('inputGithub'));
             return;
         }
         setError('');
@@ -54,9 +54,9 @@ function AddToolForm({onClose, onAdd}) {
                 asset_pattern: sug.asset_pattern || prev.asset_pattern,
                 checksums_pattern: sug.checksums_pattern || prev.checksums_pattern,
             }));
-            setParseMsg(`已识别 ${sug.repo},字段已预填,请确认后添加。`);
+            setParseMsg(t('parsed', {repo: sug.repo}));
         } catch (e) {
-            setError(`解析失败: ${e}`);
+            setError(t('parseFailed', {error: e}));
         } finally {
             setParsing(false);
         }
@@ -66,7 +66,7 @@ function AddToolForm({onClose, onAdd}) {
         e.preventDefault();
         setError('');
         if (!form.id.trim() || !form.repo.trim()) {
-            setError('id 和 repo 不能为空');
+            setError(t('required', {field: 'ID / repo'}));
             return;
         }
         // 解析 platform_map JSON(允许为空)
@@ -75,7 +75,7 @@ function AddToolForm({onClose, onAdd}) {
             try {
                 platformMap = JSON.parse(form.platform_map);
             } catch {
-                setError('platform_map 不是合法 JSON');
+                setError(t('invalidPlatformMap'));
                 return;
             }
         }
@@ -103,19 +103,18 @@ function AddToolForm({onClose, onAdd}) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>添加工具</h2>
+                    <h2>{t('addDialog')}</h2>
                     <button className="btn btn-ghost btn-sm" onClick={onClose}>✕</button>
                 </div>
                 <form onSubmit={handleSubmit} className="modal-body">
                     <div className="quick-add">
-                        <Field label="GitHub 地址(快速加入)"
-                               hint="粘贴仓库地址,自动识别并预填下方字段,可手动微调">
+                        <Field label={t('githubQuick')} hint={t('githubQuickHint')}>
                             <div className="quick-row">
                                 <input value={ghUrl} onChange={e => setGhUrl(e.target.value)}
-                                       placeholder="https://github.com/owner/repo 或 owner/repo"/>
+                                       placeholder={t('githubPlaceholder')}/>
                                 <button type="button" className="btn btn-primary"
                                         onClick={handleParse} disabled={parsing}>
-                                    {parsing ? '解析中…' : '解析'}
+                                    {parsing ? t('parsing') : t('parse')}
                                 </button>
                             </div>
                             {parseMsg && <div className="form-info quick-msg">{parseMsg}</div>}
@@ -123,46 +122,46 @@ function AddToolForm({onClose, onAdd}) {
                     </div>
                     <div className="form-divider"/>
                     <div className="field-grid">
-                        <Field label="ID *" hint="唯一标识,如 asc">
+                        <Field label={t('id')} hint={t('idHint')}>
                             <input value={form.id} onChange={set('id')} placeholder="asc"/>
                         </Field>
-                        <Field label="名称" hint="显示名,默认同 ID">
+                        <Field label={t('name')} hint={t('nameHint')}>
                             <input value={form.name} onChange={set('name')} placeholder="asc"/>
                         </Field>
-                        <Field label="GitHub 仓库 *" hint="owner/repo">
+                        <Field label={t('repo')} hint="owner/repo">
                             <input value={form.repo} onChange={set('repo')} placeholder="rorkai/App-Store-Connect-CLI"/>
                         </Field>
-                        <Field label="二进制名" hint="安装后的可执行文件名,默认同 ID">
+                        <Field label={t('binary')} hint={t('binaryHint')}>
                             <input value={form.binary} onChange={set('binary')} placeholder="asc"/>
                         </Field>
-                        <Field label="资产命名模板" hint="{name}/{version}/{os}/{arch} 占位符">
+                        <Field label={t('assetPattern')} hint={t('assetHint')}>
                             <input value={form.asset_pattern} onChange={set('asset_pattern')}/>
                         </Field>
-                        <Field label="校验文件模板">
+                        <Field label={t('checksumPattern')}>
                             <input value={form.checksums_pattern} onChange={set('checksums_pattern')}/>
                         </Field>
-                        <Field label="版本命令" hint="默认 --version">
+                        <Field label={t('versionCommand')} hint={t('versionCommandHint')}>
                             <input value={form.version_cmd} onChange={set('version_cmd')} placeholder="--version"/>
                         </Field>
-                        <Field label="版本正则" hint="提取版本的正则捕获组,留空自动匹配 x.y.z">
+                        <Field label={t('versionRegex')} hint={t('versionRegexHint')}>
                             <input value={form.version_regex} onChange={set('version_regex')}
                                    placeholder="^([0-9]+\.[0-9]+\.[0-9]+)"/>
                         </Field>
                     </div>
-                    <Field label="平台映射 JSON" hint="GOOS/GOARCH → asset 命名,留空用默认">
+                    <Field label={t('platformMap')} hint={t('platformHint')}>
                         <textarea value={form.platform_map} onChange={set('platform_map')} rows={3}
                                   className="mono"/>
                     </Field>
-                    <Field label="安装目录(可选)" hint="留空用全局 ~/.local/bin">
+                    <Field label={t('optionalInstallDir')} hint={t('optionalInstallHint')}>
                         <input value={form.install_dir} onChange={set('install_dir')}
                                placeholder="~/.local/bin"/>
                     </Field>
 
                     {error && <div className="form-error">{error}</div>}
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-ghost" onClick={onClose}>取消</button>
+                        <button type="button" className="btn btn-ghost" onClick={onClose}>{t('cancel')}</button>
                         <button type="submit" className="btn btn-primary" disabled={saving}>
-                            {saving ? '添加中…' : '添加'}
+                            {saving ? t('adding') : t('add')}
                         </button>
                     </div>
                 </form>

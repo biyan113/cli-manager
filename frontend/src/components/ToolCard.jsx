@@ -1,9 +1,9 @@
-function ProgressBar({percent, phase}) {
+function ProgressBar({percent, phase, t}) {
     const phaseLabel = {
-        'resolve': '解析版本…',
-        'download': '下载中',
-        'checksum': '校验中',
-        'install': '安装中',
+        'resolve': t('phaseResolve'),
+        'download': t('phaseDownload'),
+        'checksum': t('phaseChecksum'),
+        'install': t('phaseInstall'),
     };
     return (
         <div className="progress-wrap">
@@ -17,13 +17,13 @@ function ProgressBar({percent, phase}) {
     );
 }
 
-function VersionBadge({installed, latest, updateAvailable}) {
-    if (!installed) return <span className="badge badge-muted">未安装</span>;
-    if (updateAvailable) return <span className="badge badge-warn">有新版本</span>;
-    return <span className="badge badge-ok">已是最新</span>;
+function VersionBadge({installed, updateAvailable, t}) {
+    if (!installed) return <span className="badge badge-muted">{t('notInstalled')}</span>;
+    if (updateAvailable) return <span className="badge badge-warn">{t('updateAvailable')}</span>;
+    return <span className="badge badge-ok">{t('upToDate')}</span>;
 }
 
-function ToolCard({tool, busy, onAction, onDowngrade, onExplain}) {
+function ToolCard({tool, busy, onAction, onDowngrade, onExplain, t}) {
     const {spec} = tool;
     const isBusy = !!busy;
     const canInstall = !isBusy && !tool.installed;
@@ -45,15 +45,15 @@ function ToolCard({tool, busy, onAction, onDowngrade, onExplain}) {
             <div className="card-body">
                 <div className="version-row">
                     <div className="version-cell">
-                        <div className="version-label">已安装</div>
+                        <div className="version-label">{t('installed')}</div>
                         <div className="version-value">
                             {tool.installed ? <strong>{tool.installed_version}</strong> : <span className="muted">—</span>}
-                            {tool.installed_from === 'recorded' && <span className="hint" title="从记录读取,未实时探测">(记录)</span>}
+                            {tool.installed_from === 'recorded' && <span className="hint" title={t('recordedTitle')}>{t('recorded')}</span>}
                         </div>
                     </div>
                     <div className="version-arrow">→</div>
                     <div className="version-cell">
-                        <div className="version-label">最新</div>
+                        <div className="version-label">{t('latest')}</div>
                         <div className="version-value">
                             {tool.latest_version ? <strong>{tool.latest_version}</strong> : <span className="muted">—</span>}
                         </div>
@@ -63,44 +63,45 @@ function ToolCard({tool, busy, onAction, onDowngrade, onExplain}) {
                             installed={tool.installed}
                             latest={tool.latest_version}
                             updateAvailable={tool.update_available}
+                            t={t}
                         />
                     </div>
                 </div>
 
                 {tool.error && <div className="card-error" title={tool.error}>{tool.error}</div>}
 
-                {isBusy && <ProgressBar percent={busy.percent} phase={busy.phase}/>}
+                {isBusy && <ProgressBar percent={busy.percent} phase={busy.phase} t={t}/>}
             </div>
 
             <div className="card-actions">
                 <button className="btn btn-ghost btn-sm" disabled={isBusy}
-                        onClick={() => onExplain(spec.id)} title="拉取最新仓库说明并生成中文简介">
-                    说明
+                        onClick={() => onExplain(spec.id)} title={t('explainTitle')}>
+                    {t('explain')}
                 </button>
                 {canInstall && (
                     <button className="btn btn-primary btn-sm" onClick={() => onAction('install', spec.id)}>
-                        安装
+                        {t('install')}
                     </button>
                 )}
                 {canUpdate && (
                     <button className="btn btn-primary btn-sm" onClick={() => onAction('update', spec.id)}>
-                        更新到 {tool.latest_version}
+                        {t('updateTo', {version: tool.latest_version})}
                     </button>
                 )}
                 {canDowngrade && !isBusy && (
                     <button className="btn btn-ghost btn-sm" onClick={() => onDowngrade(spec.id)}>
-                        降级
+                        {t('downgrade')}
                     </button>
                 )}
                 {tool.installed && (
                     <button className="btn btn-danger btn-sm" disabled={isBusy}
                             onClick={() => onAction('uninstall', spec.id)}>
-                        卸载
+                        {t('uninstall')}
                     </button>
                 )}
                 <button className="btn btn-ghost btn-sm" disabled={isBusy}
                         onClick={() => onAction('remove', spec.id)}>
-                    移除
+                    {t('remove')}
                 </button>
             </div>
         </div>

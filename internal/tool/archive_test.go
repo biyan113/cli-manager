@@ -74,8 +74,8 @@ func writeTestTarGz(t *testing.T, entries map[string][]byte) string {
 func TestExtractBinaryFromZip(t *testing.T) {
 	binary := []byte("fake mach-o gh binary")
 	p := writeTestZip(t, map[string][]byte{
-		"gh_2.97.0_macOS_arm64/LICENSE": []byte("license text"),
-		"gh_2.97.0_macOS_arm64/gh":      binary,
+		"gh_2.97.0_macOS_arm64/LICENSE":  []byte("license text"),
+		"gh_2.97.0_macOS_arm64/gh":       binary,
 		"gh_2.97.0_macOS_arm64/man/gh.1": []byte("man page"),
 	})
 	out, err := extractBinary(p, "gh")
@@ -89,12 +89,26 @@ func TestExtractBinaryFromZip(t *testing.T) {
 	}
 }
 
+func TestExtractWindowsExeFromZip(t *testing.T) {
+	binary := []byte("fake windows executable")
+	p := writeTestZip(t, map[string][]byte{"bin/gh.exe": binary})
+	out, err := extractBinary(p, "gh")
+	if err != nil {
+		t.Fatalf("extractBinary: %v", err)
+	}
+	defer os.Remove(out)
+	data, _ := os.ReadFile(out)
+	if !bytes.Equal(data, binary) {
+		t.Fatalf("提取内容不符: got %q", data)
+	}
+}
+
 // TestExtractBinaryFromTarGz 模拟 lazygit 的 tar.gz:lazygit_0.64.0_darwin_arm64/lazygit。
 func TestExtractBinaryFromTarGz(t *testing.T) {
 	binary := []byte("fake mach-o lazygit binary")
 	p := writeTestTarGz(t, map[string][]byte{
 		"lazygit_0.64.0_darwin_arm64/LICENSE": []byte("license"),
-		"lazygit_0.64.0_darwin_arm64/lazygit":  binary,
+		"lazygit_0.64.0_darwin_arm64/lazygit": binary,
 	})
 	out, err := extractBinary(p, "lazygit")
 	if err != nil {
@@ -134,7 +148,7 @@ func TestInstallVersionFromZip(t *testing.T) {
 	// zip 内含 asc 二进制
 	realBin := []byte("real asc binary content")
 	zipPayload := buildZipBytes(t, map[string][]byte{
-		"asc_3.6.0_macOS_arm64/asc": realBin,
+		"asc_3.6.0_macOS_arm64/asc":    realBin,
 		"asc_3.6.0_macOS_arm64/README": []byte("readme"),
 	})
 	sum := sha256.Sum256(zipPayload)
@@ -196,4 +210,3 @@ func buildZipBytes(t *testing.T, entries map[string][]byte) []byte {
 	}
 	return data
 }
-

@@ -89,8 +89,8 @@ func NormalizeAssetName(name string) string {
 	return strings.ToLower(name)
 }
 
-// FindAsset 在 release assets 里定位目标 asset 名。
-// 先精确匹配;失败则对每个 asset 做归一化后比较,再退化为子串包含。
+// FindAsset locates a release asset. Extension-less templates only match formats
+// the installer understands, preventing accidental selection of .deb/.rpm files.
 func FindAsset(assets []AssetLike, want string) (found string, ok bool) {
 	if assets == nil {
 		return "", false
@@ -108,10 +108,13 @@ func FindAsset(assets []AssetLike, want string) (found string, ok bool) {
 			return a.Name(), true
 		}
 	}
-	// 3. 子串包含(兜底,如用户只填了部分模式)
-	for _, a := range assets {
-		if strings.Contains(NormalizeAssetName(a.Name()), low) {
-			return a.Name(), true
+	// 3. Match a supported executable/archive suffix.
+	for _, suffix := range []string{".tar.gz", ".tgz", ".zip", ".exe"} {
+		candidate := low + suffix
+		for _, a := range assets {
+			if NormalizeAssetName(a.Name()) == candidate {
+				return a.Name(), true
+			}
 		}
 	}
 	return "", false

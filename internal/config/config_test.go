@@ -19,8 +19,8 @@ func TestLoadCreatesDefault(t *testing.T) {
 	if c.InstallDir != "~/.local/bin" {
 		t.Errorf("InstallDir = %q, want ~/.local/bin", c.InstallDir)
 	}
-	if len(c.Tools) == 0 {
-		t.Fatal("默认配置应包含至少一个工具")
+	if len(c.Tools) != 5 {
+		t.Fatalf("默认配置工具数 = %d, want 5", len(c.Tools))
 	}
 	if c.Tools[0].ID != "asc" {
 		t.Errorf("默认首个工具 = %q, want asc", c.Tools[0].ID)
@@ -31,6 +31,57 @@ func TestLoadCreatesDefault(t *testing.T) {
 	// 确认文件真实写盘了
 	if _, err := os.Stat(ConfigPath()); err != nil {
 		t.Errorf("配置文件未落盘: %v", err)
+	}
+}
+
+func TestLoadMigratesDefaultsOnce(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	legacy := &Config{InstallDir: "~/custom-bin", Tools: []ToolSpec{{ID: "asc", Repo: "custom/asc", Binary: "my-asc"}}}
+	if err := legacy.Save(); err != nil {
+		t.Fatal(err)
+	}
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.SchemaVersion != CurrentSchemaVersion || len(c.Tools) != 5 {
+		t.Fatalf("migration = version %d, tools %d", c.SchemaVersion, len(c.Tools))
+	}
+	if c.Tools[0].Repo != "custom/asc" || c.Tools[0].Binary != "my-asc" {
+		t.Fatal("迁移不应覆盖用户修改过的工具")
+	}
+	if err := c.RemoveTool("gh"); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Save(); err != nil {
+		t.Fatal(err)
+	}
+	c, err = Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(c.Tools) != 4 {
+		t.Fatalf("已迁移配置不应重新添加用户删除的工具，got %d", len(c.Tools))
+	}
+}
+
+func TestSetLanguage(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	c, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.SetLanguage("en"); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.SetLanguage("fr"); err == nil {
+		t.Fatal("unsupported language should fail")
+	}
+	c, _ = Load()
+	if c.Language != "en" {
+		t.Fatalf("language = %q, want en", c.Language)
 	}
 }
 
@@ -54,22 +105,22 @@ func TestLoadRoundTrip(t *testing.T) {
 
 func TestAddRemoveTool(t *testing.T) {
 	c := &Config{InstallDir: "~/.local/bin", Tools: DefaultTools()}
-	spec := ToolSpec{ID: "gh", Name: "gh", Repo: "cli/cli", Binary: "gh"}
+	spec := ToolSpec{ID: "custom", Name: "custom", Repo: "example/custom", Binary: "custom"}
 	if err := c.AddTool(spec); err != nil {
 		t.Fatalf("AddTool: %v", err)
 	}
-	if len(c.Tools) != 2 {
-		t.Fatalf("len(Tools) = %d, want 2", len(c.Tools))
+	if len(c.Tools) != 6 {
+		t.Fatalf("len(Tools) = %d, want 6", len(c.Tools))
 	}
 	// 重复 id 应报错
-	if err := c.AddTool(ToolSpec{ID: "gh", Repo: "x/y"}); err == nil {
+	if err := c.AddTool(ToolSpec{ID: "custom", Repo: "x/y"}); err == nil {
 		t.Error("重复 id 应报错")
 	}
 	// 移除
-	if err := c.RemoveTool("gh"); err != nil {
+	if err := c.RemoveTool("custom"); err != nil {
 		t.Fatalf("RemoveTool: %v", err)
 	}
-	if err := c.RemoveTool("gh"); err != ErrNotFound {
+	if err := c.RemoveTool("custom"); err != ErrNotFound {
 		t.Errorf("移除不存在的工具应返回 ErrNotFound, got %v", err)
 	}
 	// 校验必填

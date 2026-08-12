@@ -137,6 +137,14 @@ func TestFindAsset(t *testing.T) {
 	if _, ok := FindAsset(nil, "x"); ok {
 		t.Error("nil assets 不应匹配")
 	}
+	archives := []AssetLike{
+		mockAsset{"gh_2.97.0_linux_amd64.deb"},
+		mockAsset{"gh_2.97.0_linux_amd64.rpm"},
+		mockAsset{"gh_2.97.0_linux_amd64.tar.gz"},
+	}
+	if name, ok := FindAsset(archives, "gh_2.97.0_linux_amd64"); !ok || name != "gh_2.97.0_linux_amd64.tar.gz" {
+		t.Fatalf("应选择可解压资产而非系统包，got %q", name)
+	}
 }
 
 // ---------- checksums ----------
@@ -162,6 +170,17 @@ func TestParseChecksums(t *testing.T) {
 	}
 	if _, ok := sums["badhash"]; ok {
 		t.Error("非法 hash 行应被跳过")
+	}
+}
+
+func TestParseChecksumsBSD(t *testing.T) {
+	hash := strings64("abc")
+	sums, err := parseChecksums([]byte("SHA256 (yq_darwin_arm64) = " + hash + "\n"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sums["yq_darwin_arm64"] != hash {
+		t.Fatalf("BSD SHA256 未解析: %v", sums)
 	}
 }
 
