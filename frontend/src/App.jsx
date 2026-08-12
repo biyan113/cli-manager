@@ -106,7 +106,11 @@ function App() {
             if (op === 'install') await InstallTool(id);
             else if (op === 'update') await UpdateTool(id);
             else if (op === 'uninstall') {
-                if (window.confirm(t('confirmUninstall', {id}))) await UninstallTool(id);
+				if (window.confirm(t('confirmUninstall', {id}))) {
+					await UninstallTool(id);
+					await refresh();
+					showToast('success', t('uninstallSuccess', {id}));
+				}
                 return;
             }
             else if (op === 'remove') {

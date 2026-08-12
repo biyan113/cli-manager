@@ -156,6 +156,8 @@ func TestExpandPath(t *testing.T) {
 	cases := []struct{ in, want string }{
 		{"~/.local/bin", filepath.Join(home, ".local", "bin")},
 		{"~/x", filepath.Join(home, "x")},
+		{`~\bin`, filepath.Join(home, "bin")},
+		{`~\tools\bin`, filepath.Join(home, "tools", "bin")},
 		{"~", home},
 		{"/usr/local/bin", "/usr/local/bin"},
 		{"", ""},

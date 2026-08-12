@@ -7,7 +7,7 @@
   <Identity
     Name="bytenote.CLIBox"
     Publisher="CN=88C646E7-F180-4071-8BEA-93AEBF0E0696"
-    Version="1.0.3.0"
+    Version="1.0.4.0"
     ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>CLI Box</DisplayName>

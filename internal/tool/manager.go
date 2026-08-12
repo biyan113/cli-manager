@@ -275,19 +275,43 @@ func (m *Manager) Downgrade(ctx context.Context, spec config.ToolSpec, version s
 	return m.installVersion(ctx, spec, version, OpDowngrade)
 }
 
-// Uninstall 卸载一个工具:删除二进制并清 state。
-// 只移除注册;卸载失败但文件已删时仍算成功。
+// Uninstall 卸载一个工具:优先删除安装时记录的真实路径，再清 state。
+// 配置中的安装目录可能之后被修改，因此不能只依赖当前计算路径。
 func (m *Manager) Uninstall(spec config.ToolSpec) error {
-	target := m.binPath(spec)
-	if target != "" {
-		if _, err := os.Stat(target); err == nil {
-			if err := os.Remove(target); err != nil {
-				return wrapErr(spec.ID, fmt.Errorf("删除二进制: %w", err))
+	m.installMu.Lock()
+	defer m.installMu.Unlock()
+
+	targets := make([]string, 0, 2)
+	if info, ok := m.State.Versions[spec.ID]; ok && strings.TrimSpace(info.BinPath) != "" {
+		targets = append(targets, config.ExpandPath(info.BinPath))
+	}
+	computed := m.binPath(spec)
+	if computed != "" && (len(targets) == 0 || !samePath(targets[0], computed)) {
+		targets = append(targets, computed)
+	}
+
+	for _, target := range targets {
+		if _, err := os.Stat(target); err != nil {
+			if os.IsNotExist(err) {
+				continue
 			}
+			return wrapErr(spec.ID, fmt.Errorf("检查二进制 %s: %w", target, err))
+		}
+		if err := os.Remove(target); err != nil {
+			return wrapErr(spec.ID, fmt.Errorf("删除二进制 %s: %w", target, err))
 		}
 	}
 	delete(m.State.Versions, spec.ID)
 	return m.State.Save()
+}
+
+func samePath(a, b string) bool {
+	a = filepath.Clean(a)
+	b = filepath.Clean(b)
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(a, b)
+	}
+	return a == b
 }
 
 // wrapErr 让错误带工具上下文。

@@ -290,7 +290,7 @@ func (s *State) Save() error {
 	return atomicWriteJSON(StatePath(), s)
 }
 
-// ExpandPath 展开路径中的 ~ 前缀。
+// ExpandPath 展开路径中的 ~ 前缀，同时接受 Unix 与 Windows 分隔符。
 func ExpandPath(p string) string {
 	if p == "" {
 		return p
@@ -299,9 +299,11 @@ func ExpandPath(p string) string {
 		home, _ := os.UserHomeDir()
 		return home
 	}
-	if strings.HasPrefix(p, "~/") {
+	if strings.HasPrefix(p, "~/") || strings.HasPrefix(p, `~\`) {
 		home, _ := os.UserHomeDir()
-		return filepath.Join(home, p[2:])
+		rest := strings.TrimLeft(p[1:], `/\`)
+		rest = strings.NewReplacer("/", string(filepath.Separator), `\`, string(filepath.Separator)).Replace(rest)
+		return filepath.Join(home, rest)
 	}
 	return p
 }

@@ -2,7 +2,7 @@ const messages = {
     'zh-CN': {
         toolCount: '{count} 个工具', refresh: '刷新', settings: '设置', addTool: '+ 添加工具',
         empty: '还没有管理的工具', addFirst: '添加第一个工具', operationFailed: '操作失败',
-        operationSuccess: '{id} {operation} {version} 成功', confirmUninstall: '确认卸载 {id}？',
+        operationSuccess: '{id} {operation} {version} 成功', confirmUninstall: '确认卸载 {id}？', uninstallSuccess: '{id} 已卸载',
         confirmRemove: '从清单移除 {id}（不影响已安装的二进制）？', noVersions: '{id}：没有可用版本',
         chooseVersion: '选择要降级到的版本（可用：{versions}）', added: '已添加 {id}', addFailed: '添加失败：{error}',
         installed: '已安装', latest: '最新', notInstalled: '未安装', updateAvailable: '有新版本', upToDate: '已是最新',
@@ -29,7 +29,7 @@ const messages = {
     en: {
         toolCount: '{count} tools', refresh: 'Refresh', settings: 'Settings', addTool: '+ Add tool',
         empty: 'No tools are being managed yet', addFirst: 'Add your first tool', operationFailed: 'Operation failed',
-        operationSuccess: '{id} {operation} {version} succeeded', confirmUninstall: 'Uninstall {id}?',
+        operationSuccess: '{id} {operation} {version} succeeded', confirmUninstall: 'Uninstall {id}?', uninstallSuccess: '{id} was uninstalled',
         confirmRemove: 'Remove {id} from the list (the installed binary will remain)?', noVersions: '{id}: no versions available',
         chooseVersion: 'Choose a version to install (available: {versions})', added: 'Added {id}', addFailed: 'Could not add tool: {error}',
         installed: 'Installed', latest: 'Latest', notInstalled: 'Not installed', updateAvailable: 'Update available', upToDate: 'Up to date',

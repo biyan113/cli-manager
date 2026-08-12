@@ -64,6 +64,67 @@ func TestNormalizeVersion(t *testing.T) {
 	}
 }
 
+func TestUninstallUsesRecordedBinaryPath(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("APPDATA", home)
+	t.Setenv("XDG_CONFIG_HOME", home)
+
+	recordedDir := t.TempDir()
+	recordedPath := filepath.Join(recordedDir, "jq")
+	if err := os.WriteFile(recordedPath, []byte("binary"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	configuredDir := t.TempDir()
+	state := &config.State{Versions: map[string]config.InstalledInfo{
+		"jq": {Version: "1.8.2", BinPath: recordedPath},
+	}}
+	manager := NewManager(
+		&config.Config{InstallDir: configuredDir},
+		state,
+		nil,
+	)
+
+	if err := manager.Uninstall(config.ToolSpec{ID: "jq", Binary: "jq"}); err != nil {
+		t.Fatalf("Uninstall: %v", err)
+	}
+	if _, err := os.Stat(recordedPath); !os.IsNotExist(err) {
+		t.Fatalf("recorded binary should be removed, stat error = %v", err)
+	}
+	if _, ok := state.Versions["jq"]; ok {
+		t.Fatal("uninstall should clear the recorded state")
+	}
+}
+
+func TestUninstallFallsBackToCurrentConfiguredPath(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("APPDATA", home)
+	t.Setenv("XDG_CONFIG_HOME", home)
+
+	configuredDir := t.TempDir()
+	configuredPath := filepath.Join(configuredDir, "jq")
+	if err := os.WriteFile(configuredPath, []byte("binary"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	state := &config.State{Versions: map[string]config.InstalledInfo{
+		"jq": {Version: "1.8.2", BinPath: filepath.Join(t.TempDir(), "missing-jq")},
+	}}
+	manager := NewManager(
+		&config.Config{InstallDir: configuredDir},
+		state,
+		nil,
+	)
+
+	if err := manager.Uninstall(config.ToolSpec{ID: "jq", Binary: "jq"}); err != nil {
+		t.Fatalf("Uninstall: %v", err)
+	}
+	if _, err := os.Stat(configuredPath); !os.IsNotExist(err) {
+		t.Fatalf("configured binary should be removed, stat error = %v", err)
+	}
+}
+
 // TestCandidateVersions 覆盖 gh 类仓库:tag 带 v,但资产名版本不带 v。
 func TestCandidateVersions(t *testing.T) {
 	// tag=v2.97.0、无 transform → 先试 v2.97.0,再试去 v 的 2.97.0
