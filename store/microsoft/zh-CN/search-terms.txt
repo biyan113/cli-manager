@@ -1,0 +1,7 @@
+CLI 工具
+GitHub CLI
+开发者工具
+GitHub Releases
+命令行管理
+SHA-256 校验
+版本更新
