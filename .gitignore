@@ -2,7 +2,6 @@
 build/bin
 cli-manager
 frontend/dist
-frontend/wailsjs
 /work/
 
 # 依赖
