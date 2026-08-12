@@ -19,10 +19,10 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     "CLI Box",
-		Width:     960,
-		Height:    640,
-		MinWidth:  800,
-		MinHeight: 560,
+		Width:     760,
+		Height:    480,
+		MinWidth:  640,
+		MinHeight: 400,
 		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
@@ -36,7 +36,8 @@ func main() {
 				FullSizeContent:            true, // 内容铺满整个窗口(含标题栏区域)
 			},
 		},
-		OnStartup: app.startup,
+		OnStartup:  app.startup,
+		OnDomReady: app.domReady,
 		Bind: []interface{}{
 			app,
 		},

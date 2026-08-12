@@ -73,6 +73,12 @@ func (a *App) startup(ctx context.Context) {
 	}
 }
 
+// domReady centers the compact initial window after the native WebView exists.
+// This avoids oversized or partially off-screen placement on high-DPI Windows displays.
+func (a *App) domReady(ctx context.Context) {
+	runtime.WindowCenter(ctx)
+}
+
 // log 发送一条日志事件到前端。
 func (a *App) log(level, message string) {
 	if a.ctx == nil {
