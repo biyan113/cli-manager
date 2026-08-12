@@ -115,7 +115,35 @@ body {
 
 .topbar-actions { display: flex; gap: 8px; }
 
-/* 窗口控制:使用系统原生红黄绿按钮(Frameless + TitlebarAppearsTransparent),前端不再自绘 */
+/* Windows 无边框窗口控制；macOS 继续使用系统原生红黄绿按钮。 */
+.window-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+    --wails-draggable: none;
+}
+
+.window-control {
+    width: 34px;
+    height: 30px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font: 600 18px/1 var(--font-sans);
+    cursor: pointer;
+}
+
+.window-control:hover {
+    background: var(--card);
+    color: var(--text);
+}
+
+.window-control-close:hover {
+    background: #c42b1c;
+    color: #fff;
+}
 
 .content {
     flex: 1;

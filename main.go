@@ -19,10 +19,11 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     "CLI Box",
-		Width:     1080,
-		Height:    720,
+		Width:     960,
+		Height:    640,
 		MinWidth:  800,
 		MinHeight: 560,
+		Frameless: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

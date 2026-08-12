@@ -17,7 +17,14 @@ import {
     GetAvailableVersions,
     GetToolExplanation,
 } from "../wailsjs/go/main/App";
-import {EventsOn, EventsOff} from "../wailsjs/runtime/runtime";
+import {
+    Environment,
+    EventsOn,
+    EventsOff,
+    Quit,
+    WindowMinimise,
+    WindowToggleMaximise,
+} from "../wailsjs/runtime/runtime";
 
 import ToolCard from './components/ToolCard';
 import AddToolForm from './components/AddToolForm';
@@ -34,6 +41,7 @@ function App() {
     const [config, setConfig] = useState({install_dir: '', has_token: false, has_deepseek_token: false, deepseek_model: '', language: 'auto', tool_count: 0});
     const [explain, setExplain] = useState(null); // {id, name, loading, text, textEN, releases, error}
     const [toast, setToast] = useState(null);
+    const [platform, setPlatform] = useState('');
     const toastTimer = useRef(null);
     const t = useMemo(() => createTranslator(config.language), [config.language]);
     const tRef = useRef(t);
@@ -49,6 +57,7 @@ function App() {
     useEffect(() => {
         refresh();
         GetConfig().then(setConfig);
+        Environment().then(environment => setPlatform(environment.platform || ''));
 
         const onProgress = (e) => {
             setBusy(prev => ({
@@ -190,6 +199,13 @@ function App() {
                     <button className="btn btn-ghost" onClick={refresh}>{t('refresh')}</button>
                     <button className="btn btn-ghost" onClick={() => setShowSettings(true)}>{t('settings')}</button>
                     <button className="btn btn-primary" onClick={() => setShowAdd(true)}>{t('addTool')}</button>
+                    {platform === 'windows' && (
+                        <div className="window-controls" aria-label="Window controls">
+                            <button className="window-control" aria-label="Minimize" title="Minimize" onClick={WindowMinimise}>—</button>
+                            <button className="window-control" aria-label="Maximize or restore" title="Maximize or restore" onClick={WindowToggleMaximise}>□</button>
+                            <button className="window-control window-control-close" aria-label="Close" title="Close" onClick={Quit}>×</button>
+                        </div>
+                    )}
                 </div>
             </header>
 

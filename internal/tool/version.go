@@ -6,7 +6,7 @@ import (
 )
 
 // CompareVersions 比较两个版本字符串,返回 <0 / 0 / >0。
-// 忽略前导 v/V(GitHub tag 常带 v,探测出的版本号不带);
+// 忽略 GitHub tag 在第一个数字版本前的前缀(如 v、jq-、release-);
 // 优先按 semver 数字分段比较,无法解析的分段回退字符串比较。
 func CompareVersions(a, b string) int {
 	as := splitVersion(a)
@@ -55,7 +55,14 @@ func CompareVersions(a, b string) int {
 }
 
 func splitVersion(s string) []string {
-	s = strings.TrimPrefix(s, "v")
-	s = strings.TrimPrefix(s, "V")
+	s = strings.TrimSpace(s)
+	// GitHub release tags are not consistently semver-only. For example jq
+	// publishes "jq-1.8.2", while `jq --version` reports "jq-1.8.2" and our
+	// configured detector extracts "1.8.2". Compare from the first numeric
+	// component so a repository-specific tag prefix cannot create a false
+	// update notification.
+	if start := strings.IndexFunc(s, func(r rune) bool { return r >= '0' && r <= '9' }); start >= 0 {
+		s = s[start:]
+	}
 	return strings.Split(s, ".")
 }
