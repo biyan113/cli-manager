@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -57,7 +58,17 @@ func testSpec() config.ToolSpec {
 		ChecksumsPattern: "{name}_{version}_checksums.txt",
 		VersionCmd:       []string{"--version"},
 		VersionRegex:     `^([0-9]+\.[0-9]+\.[0-9]+)`,
+		OS:               "darwin",
+		Arch:             "arm64",
 	}
+}
+
+func testBinaryPath(dir string) string {
+	name := "asc"
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	return filepath.Join(dir, name)
 }
 
 func TestInstallVersion(t *testing.T) {
@@ -99,12 +110,12 @@ func TestInstallVersion(t *testing.T) {
 	}
 
 	// 校验文件真实落盘且可执行
-	binPath := filepath.Join(installDir, "asc")
+	binPath := testBinaryPath(installDir)
 	if _, err := os.Stat(binPath); err != nil {
 		t.Fatalf("二进制未安装: %v", err)
 	}
 	info, _ := os.Stat(binPath)
-	if info.Mode().Perm()&0o100 == 0 {
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o100 == 0 {
 		t.Errorf("二进制应可执行, mode = %v", info.Mode())
 	}
 	// 内容正确

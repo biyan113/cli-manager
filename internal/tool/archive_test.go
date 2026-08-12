@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -186,7 +187,7 @@ func TestInstallVersionFromZip(t *testing.T) {
 		t.Errorf("version = %q, want 3.6.0", res.Version)
 	}
 
-	binPath := filepath.Join(installDir, "asc")
+	binPath := testBinaryPath(installDir)
 	data, err := os.ReadFile(binPath)
 	if err != nil {
 		t.Fatalf("二进制未安装: %v", err)
@@ -195,7 +196,7 @@ func TestInstallVersionFromZip(t *testing.T) {
 		t.Errorf("安装的应为解压后的二进制, got %q want %q", data, realBin)
 	}
 	info, _ := os.Stat(binPath)
-	if info.Mode().Perm()&0o100 == 0 {
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o100 == 0 {
 		t.Errorf("二进制应可执行, mode = %v", info.Mode())
 	}
 }

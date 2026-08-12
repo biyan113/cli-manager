@@ -16,8 +16,9 @@ func TestLoadCreatesDefault(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if c.InstallDir != "~/.local/bin" {
-		t.Errorf("InstallDir = %q, want ~/.local/bin", c.InstallDir)
+	wantInstallDir := DefaultInstallDir()
+	if c.InstallDir != wantInstallDir {
+		t.Errorf("InstallDir = %q, want %q", c.InstallDir, wantInstallDir)
 	}
 	if len(c.Tools) != 5 {
 		t.Fatalf("默认配置工具数 = %d, want 5", len(c.Tools))
