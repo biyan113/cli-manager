@@ -18,7 +18,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "CLI Manager",
+		Title:     "CLI Box",
 		Width:     1080,
 		Height:    720,
 		MinWidth:  800,
@@ -35,7 +35,7 @@ func main() {
 				FullSizeContent:            true, // 内容铺满整个窗口(含标题栏区域)
 			},
 		},
-		OnStartup:        app.startup,
+		OnStartup: app.startup,
 		Bind: []interface{}{
 			app,
 		},

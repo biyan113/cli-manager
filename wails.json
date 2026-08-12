@@ -1,7 +1,7 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "cli-manager",
-  "outputfilename": "cli-manager",
+  "name": "cli-box",
+  "outputfilename": "cli-box",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
@@ -9,5 +9,12 @@
   "author": {
     "name": "biyan",
     "email": "gpt123@panw3i.com"
+  },
+  "info": {
+    "companyName": "bytenote",
+    "productName": "CLI Box",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2026 biyan",
+    "comments": "Install, verify, update, and organize CLI tools from GitHub Releases."
   }
 }

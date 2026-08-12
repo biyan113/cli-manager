@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   package:
-    runs-on: [self-hosted, Windows, X64, cli-manager]
+    runs-on: [self-hosted, Windows, X64, cli-box]
     timeout-minutes: 30
     defaults:
       run:
@@ -75,17 +75,55 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force artifacts | Out-Null
           Copy-Item build\bin\*.exe artifacts\
+
+          $sdkBin = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin\*\x64' -Directory |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $sdkBin) { throw 'Windows SDK packaging tools are missing' }
+          $makeAppx = Join-Path $sdkBin.FullName 'makeappx.exe'
+          $signTool = Join-Path $sdkBin.FullName 'signtool.exe'
+          if (-not (Test-Path $makeAppx) -or -not (Test-Path $signTool)) {
+            throw 'makeappx.exe or signtool.exe is missing'
+          }
+
+          $layout = Join-Path $PWD 'msix-layout'
+          New-Item -ItemType Directory -Force (Join-Path $layout 'Assets') | Out-Null
+          Copy-Item build\bin\cli-box.exe $layout\
+          Copy-Item packaging\msix\AppxManifest.xml $layout\
+          Copy-Item packaging\msix\Assets\*.png (Join-Path $layout 'Assets')
+
+          $msix = Join-Path $PWD 'artifacts\CLIBox_1.0.0.0_x64.msix'
+          & $makeAppx pack /d $layout /p $msix /o
+          if ($LASTEXITCODE -ne 0) { throw "MakeAppx failed with exit code $LASTEXITCODE" }
+
+          $publisher = 'CN=88C646E7-F180-4071-8BEA-93AEBF0E0696'
+          $cert = New-SelfSignedCertificate -Type Custom -Subject $publisher `
+            -KeyUsage DigitalSignature -FriendlyName 'CLI Box Store package test signing' `
+            -CertStoreLocation 'Cert:\CurrentUser\My' -HashAlgorithm SHA256
+          try {
+            & $signTool sign /fd SHA256 /sha1 $cert.Thumbprint /s My $msix
+            if ($LASTEXITCODE -ne 0) { throw "SignTool failed with exit code $LASTEXITCODE" }
+          } finally {
+            Remove-Item "Cert:\CurrentUser\My\$($cert.Thumbprint)" -ErrorAction SilentlyContinue
+          }
+
           Get-ChildItem artifacts\*.exe | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($_.Name)" | Add-Content artifacts\SHA256SUMS.txt -Encoding ascii
+          }
+          Get-ChildItem artifacts\*.msix | ForEach-Object {
             $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
             "$hash  $($_.Name)" | Add-Content artifacts\SHA256SUMS.txt -Encoding ascii
           }
           if (-not (Test-Path artifacts\*-installer.exe)) {
             throw 'NSIS installer was not produced'
           }
+          if (-not (Test-Path artifacts\*.msix)) {
+            throw 'Microsoft Store MSIX package was not produced'
+          }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cli-manager-windows-amd64
+          name: cli-box-windows-amd64
           path: artifacts/*
           if-no-files-found: error
           retention-days: 14

@@ -1,6 +1,7 @@
 # 构建产物
 build/bin
 cli-manager
+cli-box
 frontend/dist
 /work/
 

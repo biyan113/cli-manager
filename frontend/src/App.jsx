@@ -183,7 +183,7 @@ function App() {
             <header className="topbar">
                 <div className="topbar-left" />{/* 左侧留白,为系统原生红黄绿按钮让位 */}
                 <div className="brand">
-                    <h1>CLI Manager</h1>
+                    <h1>CLI Box</h1>
                     <span className="tool-count">{t('toolCount', {count: tools.length})}</span>
                 </div>
                 <div className="topbar-actions">
@@ -203,11 +203,11 @@ function App() {
                     </div>
                 ) : (
                     <div className="tool-grid">
-                        {tools.map(t => (
+                        {tools.map(toolItem => (
                             <ToolCard
-                                key={t.spec.id}
-                                tool={t}
-                                busy={busy[t.spec.id]}
+                                key={toolItem.spec.id}
+                                tool={toolItem}
+                                busy={busy[toolItem.spec.id]}
                                 onAction={handleAction}
                                 onDowngrade={handleDowngrade}
                                 onExplain={handleExplain}

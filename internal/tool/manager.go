@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"cli-manager/internal/config"
-	gh "cli-manager/internal/github"
+	"github.com/biyan113/cli-box/internal/config"
+	gh "github.com/biyan113/cli-box/internal/github"
 )
 
 // OpType 表示安装操作的种类,用于前端文案与事件标记。
@@ -33,10 +33,10 @@ type StatusHandler func(toolID string, op OpType, status string, version, messag
 
 // Manager 是 CLI 工具安装/更新的编排层。
 type Manager struct {
-	Config  *config.Config
-	State   *config.State
-	Github  *gh.Client
-	Ctx     context.Context
+	Config     *config.Config
+	State      *config.State
+	Github     *gh.Client
+	Ctx        context.Context
 	OnProgress ProgressHandler
 	OnStatus   StatusHandler
 
@@ -65,9 +65,9 @@ type ToolStatus struct {
 
 // InstallResult 是一次安装/更新操作的结果。
 type InstallResult struct {
-	ToolID   string `json:"tool_id"`
-	Version  string `json:"version"`
-	BinPath  string `json:"bin_path"`
+	ToolID    string `json:"tool_id"`
+	Version   string `json:"version"`
+	BinPath   string `json:"bin_path"`
 	Operation string `json:"operation"`
 }
 

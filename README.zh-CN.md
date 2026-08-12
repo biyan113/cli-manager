@@ -1,4 +1,4 @@
-# CLI Manager
+# CLI Box
 
 一个跨平台桌面应用：从 GitHub Releases 安装和维护 CLI 工具，并在安装前验证官方 SHA-256 校验值。
 
@@ -36,8 +36,8 @@
 - Wails 对应平台依赖（Windows 需要 WebView2）
 
 ```bash
-git clone https://github.com/biyan113/cli-manager.git
-cd cli-manager
+git clone https://github.com/biyan113/cli-box.git
+cd cli-box
 wails dev
 ```
 
@@ -57,9 +57,9 @@ wails build -clean -platform windows/amd64 -nsis
 
 ## 配置目录
 
-- Windows：`%AppData%\cli-manager\`
-- macOS：`~/Library/Application Support/cli-manager/`
-- Linux：`$XDG_CONFIG_HOME/cli-manager/` 或 `~/.config/cli-manager/`
+- Windows：`%AppData%\cli-box\`
+- macOS：`~/Library/Application Support/cli-box/`
+- Linux：`$XDG_CONFIG_HOME/cli-box/` 或 `~/.config/cli-box/`
 
 Windows 默认安装到 `~/bin`，macOS/Linux 默认安装到 `~/.local/bin`。如命令无法直接运行，请将对应目录加入 `PATH`。
 

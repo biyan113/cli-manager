@@ -1,15 +1,15 @@
-CLI Manager gives you one focused desktop app for installing and maintaining command-line tools from GitHub Releases.
+CLI Box gives you one focused desktop app for installing and maintaining command-line tools from GitHub Releases.
 
-Start with a curated set of popular developer tools, including GitHub CLI, jq, yq, fzf, and asc. CLI Manager detects the version installed in your selected tools directory, checks the latest stable release, and clearly shows when an update is available.
+Start with a curated set of popular developer tools, including GitHub CLI, jq, yq, fzf, and asc. CLI Box detects the version installed in your selected tools directory, checks the latest stable release, and clearly shows when an update is available.
 
 Every installation follows a transparent sequence: resolve the official release, select the asset for your operating system and architecture, download the publisher's checksum file, verify SHA-256, extract the executable when needed, and place it in your chosen directory. Live progress keeps each step visible.
 
 Need an earlier release? Browse recent stable versions and downgrade without rebuilding the tool yourself. You can also uninstall a managed binary or remove a tool from your list without affecting an existing installation.
 
-CLI Manager is configurable. Paste a GitHub repository URL to prefill a new tool, then adjust its asset pattern, checksum pattern, platform mapping, version command, and install location. Upstream release formats vary, so advanced settings remain under your control.
+CLI Box is configurable. Paste a GitHub repository URL to prefill a new tool, then adjust its asset pattern, checksum pattern, platform mapping, version command, and install location. Upstream release formats vary, so advanced settings remain under your control.
 
 The optional About feature can use your own DeepSeek API key to generate concise Chinese and English summaries from a tool's public repository information and README. DeepSeek is not required for installation or version management.
 
-The interface supports English and Simplified Chinese, or can follow your system language. CLI Manager has no advertising, analytics, telemetry, or account requirement.
+The interface supports English and Simplified Chinese, or can follow your system language. CLI Box has no advertising, analytics, telemetry, or account requirement.
 
 Important: A tool must publish a compatible executable or ZIP/TAR.GZ archive and a supported SHA-256 checksum file. Release formats can change upstream. Checksums verify download integrity but do not replace trust in the upstream publisher.

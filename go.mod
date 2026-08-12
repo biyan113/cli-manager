@@ -1,4 +1,4 @@
-module cli-manager
+module github.com/biyan113/cli-box
 
 go 1.23.0
 

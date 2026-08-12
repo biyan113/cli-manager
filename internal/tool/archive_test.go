@@ -17,8 +17,8 @@ import (
 	"strings"
 	"testing"
 
-	"cli-manager/internal/config"
-	gh "cli-manager/internal/github"
+	"github.com/biyan113/cli-box/internal/config"
+	gh "github.com/biyan113/cli-box/internal/github"
 )
 
 func writeTestZip(t *testing.T, entries map[string][]byte) string {

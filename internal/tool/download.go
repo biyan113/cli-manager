@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"cli-manager/internal/config"
-	gh "cli-manager/internal/github"
+	"github.com/biyan113/cli-box/internal/config"
+	gh "github.com/biyan113/cli-box/internal/github"
 )
 
 // progressReader 包裹一个 ReadCloser,在 Read 时累计字节数并回调进度。

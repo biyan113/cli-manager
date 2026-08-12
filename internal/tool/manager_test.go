@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"cli-manager/internal/config"
+	"github.com/biyan113/cli-box/internal/config"
 )
 
 // mockAsset 实现 AssetLike,便于 FindAsset 单测。

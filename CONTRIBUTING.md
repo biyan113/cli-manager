@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve CLI Manager.
+Thanks for helping improve CLI Box.
 
 ## Before opening a change
 

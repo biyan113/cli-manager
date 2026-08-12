@@ -1,6 +1,6 @@
-// Package config 负责 cli-manager 的注册表/状态读写。
-// 配置存放在 os.UserConfigDir()/cli-manager/(macOS 即
-// ~/Library/Application Support/cli-manager/),首次启动自动创建默认配置。
+// Package config 负责 CLI Box 的注册表/状态读写。
+// 配置存放在 os.UserConfigDir()/cli-box/；首次启动时会迁移旧版
+// cli-manager 目录，以保留用户配置和安装状态。
 package config
 
 import (
@@ -82,7 +82,16 @@ func configDir() string {
 		}
 		base = home
 	}
-	dir := filepath.Join(base, "cli-manager")
+	dir := filepath.Join(base, "cli-box")
+	legacyDir := filepath.Join(base, "cli-manager")
+	if _, statErr := os.Stat(dir); os.IsNotExist(statErr) {
+		if _, legacyErr := os.Stat(legacyDir); legacyErr == nil {
+			if renameErr := os.Rename(legacyDir, dir); renameErr != nil {
+				// 迁移失败时继续使用旧目录，避免用户配置丢失。
+				dir = legacyDir
+			}
+		}
+	}
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		// MkdirAll 失败不致命,读写时再报错。
 		return dir

@@ -176,7 +176,7 @@ func (c *Client) doJSON(ctx context.Context, method, path string, body io.Reader
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("X-GitHub-Api-Version", apiVersion)
-	req.Header.Set("User-Agent", "cli-manager")
+	req.Header.Set("User-Agent", "cli-box")
 	if c.token != "" {
 		req.Header.Set("Authorization", "Bearer "+c.token)
 	}

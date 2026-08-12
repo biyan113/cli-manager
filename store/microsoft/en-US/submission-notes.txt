@@ -1,4 +1,4 @@
-CLI Manager is a desktop utility for managing command-line tools published through GitHub Releases.
+CLI Box is a desktop utility for managing command-line tools published through GitHub Releases.
 
 Core install, refresh, update, downgrade, uninstall, and custom-tool features do not require an account. A GitHub token is optional and only raises GitHub API rate limits. The DeepSeek integration is optional and is not needed for certification; it requires the user to supply their own API key.
 
@@ -10,6 +10,6 @@ Suggested certification flow:
 5. Select Uninstall.
 6. Open Settings and switch between English and Simplified Chinese.
 
-Support: https://art.bytenote.net/cli-manager/
-Privacy: https://art.bytenote.net/cli-manager/privacy
-Source: https://github.com/biyan113/cli-manager
+Support: https://art.bytenote.net/cli-box/
+Privacy: https://art.bytenote.net/cli-box/privacy
+Source: https://github.com/biyan113/cli-box

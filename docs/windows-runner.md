@@ -3,7 +3,7 @@
 The Windows release workflow requires a dedicated x64 runner installed on the `D:` drive with these labels:
 
 ```text
-self-hosted, Windows, X64, cli-manager
+self-hosted, Windows, X64, cli-box
 ```
 
 ## Prerequisites
@@ -27,9 +27,7 @@ New-Item -ItemType Directory -Force D:\actions-runner | Out-Null
 Set-Location D:\actions-runner
 # Download and verify the current runner package using the commands GitHub shows.
 # Then configure it with the repository-specific URL and short-lived token:
-.\config.cmd --url https://github.com/biyan113/cli-manager --token <SHORT_LIVED_TOKEN> --name win-cli-manager --labels cli-manager --work D:\actions-runner\_work --runasservice
-.\svc.cmd install
-.\svc.cmd start
+.\config.cmd --url https://github.com/biyan113/cli-box --token <SHORT_LIVED_TOKEN> --name win-cli-box --labels cli-box --work D:\actions-runner\_work --runasservice
 ```
 
 Do not reuse a runner that processes untrusted public pull requests. The packaging workflow only runs manually or for tags, and does not run on pull requests.
@@ -38,7 +36,7 @@ Do not reuse a runner that processes untrusted public pull requests. The packagi
 
 1. Confirm the runner is **Idle** in repository settings.
 2. Run **Actions → Windows package → Run workflow**.
-3. Download `cli-manager-windows-amd64` and verify `SHA256SUMS.txt`.
+3. Download `cli-box-windows-amd64` and verify `SHA256SUMS.txt`.
 4. Install on a clean Windows user profile, launch the app, change the language, refresh tools, and install/uninstall one checksum-backed CLI.
 5. Only create a version tag after the manual workflow succeeds.
 

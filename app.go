@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"cli-manager/internal/config"
-	"cli-manager/internal/deepseek"
-	gh "cli-manager/internal/github"
-	"cli-manager/internal/tool"
+	"github.com/biyan113/cli-box/internal/config"
+	"github.com/biyan113/cli-box/internal/deepseek"
+	gh "github.com/biyan113/cli-box/internal/github"
+	"github.com/biyan113/cli-box/internal/tool"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

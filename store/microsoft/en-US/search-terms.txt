@@ -1,4 +1,4 @@
-CLI manager
+CLI Box
 command line tools
 GitHub releases
 developer tools

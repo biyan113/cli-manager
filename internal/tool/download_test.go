@@ -13,8 +13,8 @@ import (
 	"strings"
 	"testing"
 
-	"cli-manager/internal/config"
-	gh "cli-manager/internal/github"
+	"github.com/biyan113/cli-box/internal/config"
+	gh "github.com/biyan113/cli-box/internal/github"
 )
 
 // startFakeServer 启动一个模拟 GitHub Releases 的 httptest server。

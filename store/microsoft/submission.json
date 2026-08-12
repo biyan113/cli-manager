@@ -1,14 +1,20 @@
 {
-  "productName": "CLI Manager",
+  "productName": "CLI Box",
+  "storeId": "9PP8KXW3RZ5R",
+  "packageIdentity": {
+    "name": "bytenote.CLIBox",
+    "publisher": "CN=88C646E7-F180-4071-8BEA-93AEBF0E0696",
+    "publisherDisplayName": "bytenote"
+  },
   "category": "Developer tools",
   "pricing": {
     "model": "one-time purchase",
     "targetUsd": 1.99,
     "trial": false
   },
-  "supportUrl": "https://art.bytenote.net/cli-manager/",
-  "privacyPolicyUrl": "https://art.bytenote.net/cli-manager/privacy",
-  "websiteUrl": "https://github.com/biyan113/cli-manager",
+  "supportUrl": "https://art.bytenote.net/cli-box/",
+  "privacyPolicyUrl": "https://art.bytenote.net/cli-box/privacy",
+  "websiteUrl": "https://github.com/biyan113/cli-box",
   "language": "en-US",
   "notes": "Select the nearest Partner Center price tier to USD 1.99. Final package identity must come from the reserved Partner Center product."
 }

@@ -1,10 +1,10 @@
-# CLI Manager
+# CLI Box
 
 <p align="center">
-  <img src="assets/branding/cli-manager-logo-transparent.png" alt="CLI Manager logo" width="180">
+  <img src="assets/branding/cli-box-logo-transparent.png" alt="CLI Box logo" width="180">
 </p>
 
-[![CI](https://github.com/biyan113/cli-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/biyan113/cli-manager/actions/workflows/ci.yml)
+[![CI](https://github.com/biyan113/cli-box/actions/workflows/ci.yml/badge.svg)](https://github.com/biyan113/cli-box/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A cross-platform desktop app for installing and maintaining CLI tools directly from verified GitHub Release assets.
@@ -33,7 +33,7 @@ The first launch includes release patterns verified for these projects:
 | [yq](https://github.com/mikefarah/yq) | YAML/JSON/XML processor | macOS, Linux, Windows |
 | [fzf](https://github.com/junegunn/fzf) | Fuzzy finder | macOS, Linux, Windows |
 
-CLI Manager only supports releases that publish a downloadable executable or ZIP/TAR.GZ archive and a compatible SHA-256 checksum file. Release layouts can change upstream; customize a tool's patterns if needed.
+CLI Box only supports releases that publish a downloadable executable or ZIP/TAR.GZ archive and a compatible SHA-256 checksum file. Release layouts can change upstream; customize a tool's patterns if needed.
 
 ## Requirements
 
@@ -47,8 +47,8 @@ For development:
 ## Development
 
 ```bash
-git clone https://github.com/biyan113/cli-manager.git
-cd cli-manager
+git clone https://github.com/biyan113/cli-box.git
+cd cli-box
 wails dev
 ```
 
@@ -75,9 +75,9 @@ wails build -clean -platform windows/amd64 -nsis
 
 Configuration and state are stored under the operating system's user configuration directory:
 
-- Windows: `%AppData%\cli-manager\`
-- macOS: `~/Library/Application Support/cli-manager/`
-- Linux: `$XDG_CONFIG_HOME/cli-manager/` or `~/.config/cli-manager/`
+- Windows: `%AppData%\cli-box\`
+- macOS: `~/Library/Application Support/cli-box/`
+- Linux: `$XDG_CONFIG_HOME/cli-box/` or `~/.config/cli-box/`
 
 Default install directories are `~/bin` on Windows and `~/.local/bin` elsewhere. Add that directory to `PATH` if it is not already present.
 
