@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/biyan113/cli-box/internal/config"
@@ -104,7 +105,11 @@ func TestUninstallFallsBackToCurrentConfiguredPath(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", home)
 
 	configuredDir := t.TempDir()
-	configuredPath := filepath.Join(configuredDir, "jq")
+	configuredName := "jq"
+	if runtime.GOOS == "windows" {
+		configuredName += ".exe"
+	}
+	configuredPath := filepath.Join(configuredDir, configuredName)
 	if err := os.WriteFile(configuredPath, []byte("binary"), 0o755); err != nil {
 		t.Fatal(err)
 	}
