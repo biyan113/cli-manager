@@ -61,7 +61,10 @@ jobs:
           & $wails version
 
       - name: Test
-        run: go test ./...
+        run: |
+          npm ci --prefix frontend
+          npm run build --prefix frontend
+          go test ./...
 
       - name: Build NSIS installer
         run: |
