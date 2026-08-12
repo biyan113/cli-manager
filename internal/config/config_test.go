@@ -6,11 +6,18 @@ import (
 	"testing"
 )
 
+func isolateConfigDir(t *testing.T) {
+	t.Helper()
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	t.Setenv("APPDATA", dir)
+	t.Setenv("XDG_CONFIG_HOME", dir)
+}
+
 // TestLoadCreatesDefault 验证首次 Load 会创建含内置 asc 的默认配置。
 // 用临时 HOME 隔离,macOS 上 UserConfigDir 会落到 <tmp>/Library/Application Support。
 func TestLoadCreatesDefault(t *testing.T) {
-	dir := t.TempDir()
-	t.Setenv("HOME", dir)
+	isolateConfigDir(t)
 
 	c, err := Load()
 	if err != nil {
@@ -36,8 +43,7 @@ func TestLoadCreatesDefault(t *testing.T) {
 }
 
 func TestLoadMigratesDefaultsOnce(t *testing.T) {
-	dir := t.TempDir()
-	t.Setenv("HOME", dir)
+	isolateConfigDir(t)
 	legacy := &Config{InstallDir: "~/custom-bin", Tools: []ToolSpec{{ID: "asc", Repo: "custom/asc", Binary: "my-asc"}}}
 	if err := legacy.Save(); err != nil {
 		t.Fatal(err)
@@ -68,8 +74,7 @@ func TestLoadMigratesDefaultsOnce(t *testing.T) {
 }
 
 func TestSetLanguage(t *testing.T) {
-	dir := t.TempDir()
-	t.Setenv("HOME", dir)
+	isolateConfigDir(t)
 	c, err := Load()
 	if err != nil {
 		t.Fatal(err)
@@ -87,8 +92,7 @@ func TestSetLanguage(t *testing.T) {
 }
 
 func TestLoadRoundTrip(t *testing.T) {
-	dir := t.TempDir()
-	t.Setenv("HOME", dir)
+	isolateConfigDir(t)
 
 	c, err := Load()
 	if err != nil {
