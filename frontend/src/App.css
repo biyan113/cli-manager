@@ -81,6 +81,11 @@ body {
     --wails-draggable: drag; /* 无边框窗口:顶部可拖动(Wails 原生拖拽机制) */
 }
 
+.topbar-windows {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 8px 10px 8px 14px;
+}
+
 .topbar button,
 .topbar a {
     --wails-draggable: none; /* 按钮/链接不触发窗口拖动 */
@@ -94,7 +99,24 @@ body {
 
 .topbar-left { display: flex; }
 
-.topbar-actions { display: flex; gap: 8px; justify-self: end; }
+.topbar-windows .topbar-left { display: none; }
+
+.topbar-windows .brand { justify-self: start; }
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 8px;
+    --wails-draggable: none;
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 6px; }
+
+.topbar-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+}
 
 .brand h1 {
     font-family: var(--font-display);
@@ -113,26 +135,37 @@ body {
     border-radius: var(--radius-full);
 }
 
-.topbar-actions { display: flex; gap: 8px; }
-
 /* Windows 无边框窗口控制；macOS 继续使用系统原生红黄绿按钮。 */
 .window-controls {
     display: flex;
     align-items: center;
-    gap: 2px;
-    margin-left: 4px;
+    gap: 1px;
+    padding-left: 8px;
+    border-left: 1px solid var(--card-border-strong);
     --wails-draggable: none;
 }
 
 .window-control {
-    width: 34px;
-    height: 30px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 28px;
     border: 0;
-    border-radius: 8px;
+    border-radius: 7px;
     background: transparent;
     color: var(--text-muted);
-    font: 600 18px/1 var(--font-sans);
     cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.window-control svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.35;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .window-control:hover {

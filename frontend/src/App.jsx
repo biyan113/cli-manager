@@ -189,21 +189,29 @@ function App() {
 
     return (
         <div id="app">
-            <header className="topbar">
+            <header className={`topbar ${platform === 'windows' ? 'topbar-windows' : ''}`}>
                 <div className="topbar-left" />{/* 左侧留白,为系统原生红黄绿按钮让位 */}
                 <div className="brand">
                     <h1>CLI Box</h1>
                     <span className="tool-count">{t('toolCount', {count: tools.length})}</span>
                 </div>
-                <div className="topbar-actions">
-                    <button className="btn btn-ghost" onClick={refresh}>{t('refresh')}</button>
-                    <button className="btn btn-ghost" onClick={() => setShowSettings(true)}>{t('settings')}</button>
-                    <button className="btn btn-primary" onClick={() => setShowAdd(true)}>{t('addTool')}</button>
+                <div className="topbar-right">
+                    <div className="topbar-actions">
+                        <button className="btn btn-ghost" onClick={refresh}>{t('refresh')}</button>
+                        <button className="btn btn-ghost" onClick={() => setShowSettings(true)}>{t('settings')}</button>
+                        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>{t('addTool')}</button>
+                    </div>
                     {platform === 'windows' && (
                         <div className="window-controls" aria-label="Window controls">
-                            <button className="window-control" aria-label="Minimize" title="Minimize" onClick={WindowMinimise}>—</button>
-                            <button className="window-control" aria-label="Maximize or restore" title="Maximize or restore" onClick={WindowToggleMaximise}>□</button>
-                            <button className="window-control window-control-close" aria-label="Close" title="Close" onClick={Quit}>×</button>
+                            <button className="window-control" aria-label="Minimize" title="Minimize" onClick={WindowMinimise}>
+                                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5h10" /></svg>
+                            </button>
+                            <button className="window-control" aria-label="Maximize or restore" title="Maximize or restore" onClick={WindowToggleMaximise}>
+                                <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1" /></svg>
+                            </button>
+                            <button className="window-control window-control-close" aria-label="Close" title="Close" onClick={Quit}>
+                                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+                            </button>
                         </div>
                     )}
                 </div>
