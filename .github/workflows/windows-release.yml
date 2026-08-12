@@ -91,7 +91,7 @@ jobs:
           Copy-Item packaging\msix\AppxManifest.xml $layout\
           Copy-Item packaging\msix\Assets\*.png (Join-Path $layout 'Assets')
 
-          $msix = Join-Path $PWD 'artifacts\CLIBox_1.0.1.0_x64.msix'
+          $msix = Join-Path $PWD 'artifacts\CLIBox_1.0.2.0_x64.msix'
           & $makeAppx pack /d $layout /p $msix /o
           if ($LASTEXITCODE -ne 0) { throw "MakeAppx failed with exit code $LASTEXITCODE" }
 
