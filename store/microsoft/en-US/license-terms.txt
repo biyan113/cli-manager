@@ -1,0 +1,3 @@
+CLI Manager is distributed under the MIT License. The application manages third-party tools, each of which remains subject to its own license and terms. Installing a tool does not grant rights beyond those provided by its publisher.
+
+https://github.com/biyan113/cli-manager/blob/main/LICENSE

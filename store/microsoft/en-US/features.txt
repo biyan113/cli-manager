@@ -1,0 +1,10 @@
+SHA-256 verification before every tool installation
+Install, update, downgrade, and uninstall from one interface
+Curated defaults for GitHub CLI, jq, yq, fzf, and asc
+Add tools from a GitHub repository URL
+Custom release asset, checksum, platform, and version rules
+Live download and installation progress
+Installed-versus-latest version comparison
+English, Simplified Chinese, and system-language modes
+Optional bilingual summaries using your own DeepSeek API key
+No ads, analytics, telemetry, or CLI Manager account

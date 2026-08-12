@@ -1,0 +1,14 @@
+{
+  "productName": "CLI Manager",
+  "category": "Developer tools",
+  "pricing": {
+    "model": "one-time purchase",
+    "targetUsd": 1.99,
+    "trial": false
+  },
+  "supportUrl": "https://art.bytenote.net/cli-manager/",
+  "privacyPolicyUrl": "https://art.bytenote.net/cli-manager/privacy",
+  "websiteUrl": "https://github.com/biyan113/cli-manager",
+  "language": "en-US",
+  "notes": "Select the nearest Partner Center price tier to USD 1.99. Final package identity must come from the reserved Partner Center product."
+}

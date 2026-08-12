@@ -1,5 +1,9 @@
 # CLI Manager
 
+<p align="center">
+  <img src="assets/branding/cli-manager-logo-transparent.png" alt="CLI Manager logo" width="180">
+</p>
+
 [![CI](https://github.com/biyan113/cli-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/biyan113/cli-manager/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

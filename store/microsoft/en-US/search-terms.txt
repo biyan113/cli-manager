@@ -1,0 +1,10 @@
+CLI manager
+command line tools
+GitHub releases
+developer tools
+package manager
+checksum
+terminal
+GitHub CLI
+jq
+yq

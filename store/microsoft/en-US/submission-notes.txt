@@ -1,0 +1,15 @@
+CLI Manager is a desktop utility for managing command-line tools published through GitHub Releases.
+
+Core install, refresh, update, downgrade, uninstall, and custom-tool features do not require an account. A GitHub token is optional and only raises GitHub API rate limits. The DeepSeek integration is optional and is not needed for certification; it requires the user to supply their own API key.
+
+Suggested certification flow:
+1. Launch the app and select Refresh.
+2. Choose a curated tool that publishes a Windows x64 asset and checksum.
+3. Select Install and observe resolve, checksum, download, verify, and install progress.
+4. Confirm the executable appears in the configured install directory.
+5. Select Uninstall.
+6. Open Settings and switch between English and Simplified Chinese.
+
+Support: https://art.bytenote.net/cli-manager/
+Privacy: https://art.bytenote.net/cli-manager/privacy
+Source: https://github.com/biyan113/cli-manager

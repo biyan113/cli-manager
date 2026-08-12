@@ -1,0 +1,1 @@
+Install, verify, update, downgrade, and organize checksum-backed CLI tools from GitHub Releases in one focused desktop app.
